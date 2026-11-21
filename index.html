@@ -13,7 +13,7 @@
             --surface: #0f131d;
             --surface-hover: #161c2b;
             --border: rgba(255, 255, 255, 0.08);
-            --border-glow: rgba(56, 189, 248, 0.45);
+            --border-glow: rgba(56, 189, 248, 0.55);
             --text: #94a3b8;
             --text-bright: #f8fafc;
             --accent: #38bdf8;
@@ -175,27 +175,54 @@
         }
         .btn-secondary:hover { border-color: var(--accent); background: var(--surface-hover); }
 
-        /* Full-Bleed Interactive Photo Card (Right Hero) */
+        /* =========================================================
+           3D INTERACTIVE TILT CARD & GLITCH PHOTO EFFECT
+           ========================================================= */
         .profile-card-wrapper {
-            perspective: 1000px;
+            perspective: 1100px;
             display: flex;
             justify-content: center;
         }
         .profile-card {
             width: 100%;
             max-width: 360px;
-            height: 440px;
+            height: 450px;
             border-radius: 26px;
             position: relative;
             overflow: hidden;
             border: 1px solid var(--border);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8), 0 0 30px rgba(56, 189, 248, 0.1);
-            transition: transform 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease;
+            background: #090c14;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.85), 0 0 30px rgba(56, 189, 248, 0.12);
+            transform-style: preserve-3d;
+            transition: transform 0.15s ease-out, border-color 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
         }
         .profile-card:hover {
-            transform: translateY(-8px) rotateX(2deg) rotateY(-2deg);
             border-color: var(--border-glow);
-            box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.9), 0 0 40px rgba(56, 189, 248, 0.22);
+            box-shadow: 0 35px 70px -12px rgba(0, 0, 0, 0.95), 0 0 45px rgba(56, 189, 248, 0.3);
+        }
+
+        /* Holographic Glare Layer */
+        .card-glare {
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.22), transparent 60%);
+            opacity: 0;
+            pointer-events: none;
+            z-index: 4;
+            mix-blend-mode: overlay;
+            transition: opacity 0.3s ease;
+        }
+        .profile-card:hover .card-glare {
+            opacity: 1;
+        }
+
+        /* Glitch Container & Layers */
+        .glitch-box {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
         }
         .profile-photo {
             width: 100%;
@@ -203,26 +230,98 @@
             object-fit: cover;
             object-position: center 20%;
             display: block;
-            transition: transform 0.5s ease;
+            transition: transform 0.4s ease;
+        }
+        .glitch-layer {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center 20%;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        /* Trigger Glitch on Hover */
+        .profile-card:hover .glitch-layer.cyan {
+            opacity: 0.75;
+            mix-blend-mode: screen;
+            filter: drop-shadow(-4px 0 #00f2fe);
+            animation: glitch-anim-1 0.45s infinite linear alternate-reverse;
+        }
+        .profile-card:hover .glitch-layer.magenta {
+            opacity: 0.75;
+            mix-blend-mode: screen;
+            filter: drop-shadow(4px 0 #ff0055);
+            animation: glitch-anim-2 0.38s infinite linear alternate-reverse;
         }
         .profile-card:hover .profile-photo {
-            transform: scale(1.04);
+            animation: glitch-base 2.5s infinite;
         }
+
+        /* Scanline overlay on hover */
+        .scanlines {
+            position: absolute;
+            inset: 0;
+            background: repeating-linear-gradient(
+                to bottom,
+                transparent 0px,
+                transparent 2px,
+                rgba(0, 242, 254, 0.06) 3px,
+                rgba(0, 0, 0, 0.15) 4px
+            );
+            opacity: 0;
+            pointer-events: none;
+            z-index: 3;
+            transition: opacity 0.3s ease;
+        }
+        .profile-card:hover .scanlines {
+            opacity: 1;
+        }
+
+        @keyframes glitch-anim-1 {
+            0% { clip-path: inset(12% 0 78% 0); transform: translate(-6px, 2px); }
+            20% { clip-path: inset(65% 0 10% 0); transform: translate(6px, -2px); }
+            40% { clip-path: inset(35% 0 45% 0); transform: translate(-4px, 0); }
+            60% { clip-path: inset(80% 0 5% 0); transform: translate(5px, 3px); }
+            80% { clip-path: inset(20% 0 60% 0); transform: translate(-7px, -1px); }
+            100% { clip-path: inset(50% 0 30% 0); transform: translate(4px, 2px); }
+        }
+
+        @keyframes glitch-anim-2 {
+            0% { clip-path: inset(75% 0 8% 0); transform: translate(6px, -2px); }
+            25% { clip-path: inset(15% 0 68% 0); transform: translate(-5px, 2px); }
+            50% { clip-path: inset(48% 0 32% 0); transform: translate(7px, 1px); }
+            75% { clip-path: inset(5% 0 82% 0); transform: translate(-6px, -2px); }
+            100% { clip-path: inset(62% 0 18% 0); transform: translate(4px, 0); }
+        }
+
+        @keyframes glitch-base {
+            0%, 92%, 100% { transform: scale(1.03) translate(0, 0); }
+            94% { transform: scale(1.03) translate(-3px, 1px); }
+            96% { transform: scale(1.03) translate(3px, -1px); }
+            98% { transform: scale(1.03) translate(-2px, -1px); }
+        }
+
+        /* Floating 3D Glass Footer inside Card */
         .card-glass-footer {
             position: absolute;
             bottom: 14px;
             left: 14px;
             right: 14px;
-            background: rgba(11, 15, 25, 0.78);
+            background: rgba(11, 15, 25, 0.8);
             backdrop-filter: blur(14px);
             -webkit-backdrop-filter: blur(14px);
-            border: 1px solid rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.14);
             border-radius: 16px;
             padding: 12px 16px;
             display: flex;
             align-items: center;
             justify-content: space-between;
             gap: 12px;
+            z-index: 5;
+            transform: translateZ(35px);
         }
         .mini-user {
             display: flex;
@@ -525,10 +624,16 @@
                 </div>
             </div>
 
-            <!-- Interactive Full Photo Card -->
+            <!-- 3D Tilt + Glitch Photo Card -->
             <div class="profile-card-wrapper">
-                <div class="profile-card">
-                    <img src="photo.jpg" alt="Farhan Firmansyah" class="profile-photo">
+                <div class="profile-card" id="tiltCard">
+                    <div class="card-glare" id="cardGlare"></div>
+                    <div class="scanlines"></div>
+                    <div class="glitch-box">
+                        <img src="photo.jpg" alt="Farhan Firmansyah" class="profile-photo">
+                        <img src="photo.jpg" alt="" aria-hidden="true" class="glitch-layer cyan">
+                        <img src="photo.jpg" alt="" aria-hidden="true" class="glitch-layer magenta">
+                    </div>
                     <div class="card-glass-footer">
                         <div class="mini-user">
                             <img src="photo.jpg" alt="Farhan Avatar" class="mini-avatar">
@@ -705,8 +810,37 @@
         </div>
     </footer>
 
-    <!-- Counter Animation Script -->
+    <!-- Interactive Scripts: 3D Tilt + Counter Animation -->
     <script>
+        // 1. 3D Interactive Tilt & Holographic Glare
+        const tiltCard = document.getElementById('tiltCard');
+        const cardGlare = document.getElementById('cardGlare');
+
+        tiltCard.addEventListener('mousemove', (e) => {
+            const rect = tiltCard.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+
+            // Calculate rotation angles (max 16 degrees)
+            const rotateX = ((y - centerY) / centerY) * -16;
+            const rotateY = ((x - centerX) / centerX) * 16;
+
+            tiltCard.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.03, 1.03, 1.03)`;
+
+            // Move holographic glare with cursor
+            const glareX = (x / rect.width) * 100;
+            const glareY = (y / rect.height) * 100;
+            cardGlare.style.background = `radial-gradient(circle at ${glareX}% ${glareY}%, rgba(255, 255, 255, 0.28), transparent 65%)`;
+        });
+
+        tiltCard.addEventListener('mouseleave', () => {
+            tiltCard.style.transform = `rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
+        });
+
+        // 2. Counter Animation Script
         const counters = document.querySelectorAll('.stat-num');
         const observer = new IntersectionObserver(entries => {
             entries.forEach(entry => {
